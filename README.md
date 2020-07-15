@@ -1,3 +1,3 @@
 # urlshort
 
-url shortener in Go
+url shortener written in Go
