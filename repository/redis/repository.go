@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/go-redis/redis"
 	"github.com/pkg/errors"
-	"ongoing/urlshort/shortener"
 	"strconv"
+	"urlshort/shortener"
 )
 
 type redisRepo struct {
@@ -22,7 +22,17 @@ func newRedisClient(redisURL string) (*redis.Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	return client, err
+	return client, nil
+}
+
+func NewRedisRepo(redisURL string) (shortener.RedirectRepo, error) {
+	repo := &redisRepo{}
+	client, err := newRedisClient(redisURL)
+	if err != nil {
+		return nil, errors.Wrap(err, "repository.NewRedisRepo")
+	}
+	repo.client = client
+	return repo, nil
 }
 
 func (r *redisRepo) generateKey(code string) string {
@@ -56,7 +66,7 @@ func (r *redisRepo) Store(redirect *shortener.Redirect) error {
 		"url":        redirect.URL,
 		"created_at": redirect.CreatedAt,
 	}
-	_, err := r.client.HMSet(key, dta).Result()
+	_, err := r.client.HMSet(key, data).Result()
 	if err != nil {
 		return errors.Wrap(err, "repository.Redirect.Store")
 	}

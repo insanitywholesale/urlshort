@@ -3,7 +3,7 @@ package json
 import (
 	"github.com/pkg/errors"
 	"github.com/vmihailenco/msgpack"
-	"ongoing/urlshort/shortener"
+	"urlshort/shortener"
 )
 
 type Redirect struct{}

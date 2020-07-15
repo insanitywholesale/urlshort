@@ -7,8 +7,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
-	"ongoing/urlshort/shortener"
 	"time"
+	"urlshort/shortener"
 )
 
 // mongoRepo is a struct with all the fields required to create a new mongo database
@@ -54,13 +54,14 @@ func (r *mongoRepo) Find(code string) (*shortener.Redirect, error) {
 	redirect := &shortener.Redirect{}
 	collection := r.client.Database(r.database).Collection("redirects")
 	filter := bson.M{"code": code}
-	err := collection.FindOne(ctx.filter).Decode(&redirect)
+	err := collection.FindOne(ctx, filter).Decode(&redirect)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, errors.Wrap(shortener.ErrRedirectNotFound, "redirect not found")
 		}
 		return nil, errors.Wrap(err, "repository.Redirect.Find")
 	}
+	return redirect, nil
 }
 
 // Store here saves the redirect to a mongo database
