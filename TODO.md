@@ -1,4 +1,4 @@
 # things to do
 - gRPC for codes
-- postgres repo option
+- implement postgres Find and Store
 - xml serialization option

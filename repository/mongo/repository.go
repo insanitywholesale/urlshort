@@ -34,14 +34,14 @@ func newMongoClient(mongoURL string, mongoTimeout int) (*mongo.Client, error) {
 }
 
 // NewMongoRepo creates a new mongo database
-func NewMongoRepo(mongoURL, mongoDB string, mongoTimeout int) (shortener.RedirectRepo, error) {
+func NewMongoRepo(mongoURL string, mongoDB string, mongoTimeout int) (shortener.RedirectRepo, error) {
 	repo := &mongoRepo{
 		timeout:  time.Duration(mongoTimeout) * time.Second,
 		database: mongoDB,
 	}
 	client, err := newMongoClient(mongoURL, mongoTimeout)
 	if err != nil {
-		return nil, errors.Wrap(err, "repository.NewMongoRepository")
+		return nil, errors.Wrap(err, "repository.NewMongoRepo")
 	}
 	repo.client = client
 	return repo, nil
