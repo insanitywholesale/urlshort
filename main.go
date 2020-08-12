@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"syscall"
 	h "urlshort/api"
+	mockrepo "urlshort/repository/mock"
 	mr "urlshort/repository/mongo"
 	rr "urlshort/repository/redis"
 	"urlshort/shortener"
@@ -38,6 +39,12 @@ func chooseRepo() shortener.RedirectRepo {
 		mongodb := os.Getenv("MONGO_DB")
 		mongoTimeout, _ := strconv.Atoi(os.Getenv("MONGO_TIMEOUT"))
 		repo, err := mr.NewMongoRepo(mongoURL, mongodb, mongoTimeout)
+		if err != nil {
+			log.Fatal(err)
+		}
+		return repo
+	default:
+		repo, err := mockrepo.NewMockRepo()
 		if err != nil {
 			log.Fatal(err)
 		}
