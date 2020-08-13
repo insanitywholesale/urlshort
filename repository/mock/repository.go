@@ -44,5 +44,6 @@ func (r *mockRepo) Find(code string) (*shortener.Redirect, error) {
 }
 
 func (r *mockRepo) Store(sr *shortener.Redirect) error {
+	redirectList = append(redirectList, sr)
 	return nil
 }

@@ -59,6 +59,7 @@ func main() {
 		fmt.Println("No database backend has been selected")
 		os.Exit(1)
 	}
+
 	service := shortener.NewRedirectService(repo)
 	handler := h.NewHandler(service)
 
