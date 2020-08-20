@@ -8,7 +8,7 @@ import (
 
 type Redirect struct{}
 
-func (r *shortener.Redirect) Decode(input []byte) (*shortener.Redirect, error) {
+func (r *Redirect) Decode(input []byte) (*shortener.Redirect, error) {
 	redirect := &shortener.Redirect{}
 	if err := json.Unmarshal(input, redirect)
 	err != nil {
