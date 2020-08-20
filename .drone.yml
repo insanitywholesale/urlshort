@@ -1,0 +1,10 @@
+kind: pipeline
+name: default
+type: kubernetes
+
+steps:
+  - name: microsrv
+    image: golang
+    commands:
+      - go get
+      - go build
