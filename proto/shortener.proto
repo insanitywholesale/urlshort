@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+service ShortenRequest {
+	rpc GetShortURL(LongLink) return (ShortLink)
+}
+
+message LongLink {
+	string Link = 1 [json_name="link"];
+}
+
+message ShortLink {
+	string Link = 1 [json_name="link"];
+}
+
