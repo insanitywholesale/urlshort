@@ -1,7 +1,9 @@
 syntax = "proto3";
 
+package shorten;
+
 service ShortenRequest {
-	rpc GetShortURL(LongLink) return (ShortLink)
+	rpc GetShortURL(LongLink) returns (ShortLink);
 }
 
 message LongLink {
