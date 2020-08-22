@@ -66,6 +66,7 @@ func main() {
 	}
 
 	listener, err := net.Listen("tcp", ":4040")
+	log.Print(listener) //so complier no complain
 	if err != nil {
 		log.Fatal("ye dun goofed")
 	}
