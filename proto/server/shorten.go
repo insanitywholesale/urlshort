@@ -5,7 +5,7 @@ import (
 	protos "urlshort/proto/shorten"
 )
 
-type ShortenRequest {
+type ShortenRequest struct {
 	link string
 }
 

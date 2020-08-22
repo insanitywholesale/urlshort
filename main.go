@@ -5,7 +5,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
+	//"google.golang.org/grpc/reflection"
 	"log"
 	"net"
 	"net/http"
@@ -15,6 +15,7 @@ import (
 	"syscall"
 	h "urlshort/api"
 	protos "urlshort/proto/shorten"
+	shortie "urlshort/proto/server"
 	mockrepo "urlshort/repository/mock"
 	mr "urlshort/repository/mongo"
 	rr "urlshort/repository/redis"
@@ -63,6 +64,19 @@ func main() {
 		fmt.Println("No database backend has been selected")
 		os.Exit(1)
 	}
+
+	listener, err := net.Listen("tcp", ":4040")
+	if err != nil {
+		log.Fatal("ye dun goofed")
+	}
+	grpcServer := grpc.NewServer()
+	protos.RegisterShortenRequestServer(grpcServer, &shortie.ShortenRequest{})
+	err = grpcServer.Serve(listener)
+	if err != nil {
+		log.Fatal("ye dun goofed")
+	}
+
+	// the following won't run since it's listening on grpc
 
 	service := shortener.NewRedirectService(repo)
 	handler := h.NewHandler(service)
