@@ -3,9 +3,9 @@ package server
 import (
 	"context"
 	"log"
-	"urlshort/shortener"
-	mr "urlshort/repository/mock"
 	protos "urlshort/proto/shorten"
+	mr "urlshort/repository/mock"
+	"urlshort/shortener"
 )
 
 type ShortenRequest struct {
