@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package shorten;
 
+option go_package = ".;shorten";
+
 service ShortenRequest {
 	rpc GetShortURL(LongLink) returns (ShortLink);
 }

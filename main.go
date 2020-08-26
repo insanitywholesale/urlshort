@@ -22,6 +22,14 @@ import (
 	"urlshort/shortener"
 )
 
+func grpcPort() string {
+	port := "4040"
+	if os.Getenv("GRPC_PORT") != "" {
+		port = os.Getenv("GRPC_PORT")
+	}
+	return fmt.Sprintf(":%s", port)
+}
+
 func httpPort() string {
 	port := "8000"
 	if os.Getenv("PORT") != "" {
@@ -58,26 +66,33 @@ func chooseRepo() shortener.RedirectRepo {
 	return nil
 }
 
-func main() {
-	repo := chooseRepo()
-	if repo == nil {
-		fmt.Println("No database backend has been selected")
-		os.Exit(1)
-	}
-
+func setupGRPC() {
 	listener, err := net.Listen("tcp", ":4040")
-	log.Print(listener) //so complier no complain
 	if err != nil {
 		log.Fatal("ye dun goofed")
 	}
 	grpcServer := grpc.NewServer()
 	protos.RegisterShortenRequestServer(grpcServer, &shortie.ShortenRequest{})
-	err = grpcServer.Serve(listener)
-	if err != nil {
-		log.Fatal("ye dun goofed")
-	}
+	grpcerrs := make(chan error, 2)
+	go func() {
+		fmt.Println("Listening for grpc on port :4040")
+		grpcerrs <- grpcServer.Serve(listener)
+	}()
+	go func() {
+		c := make(chan os.Signal, 1)
+		signal.Notify(c, syscall.SIGINT)
+		grpcerrs <- fmt.Errorf("%s", <-c)
+	}()
 
-	// the following won't run since it's listening on grpc
+	fmt.Printf("Terminated %s\n", <-grpcerrs)
+}
+
+func setupHTTP() {
+	repo := chooseRepo()
+	if repo == nil {
+		fmt.Println("No database backend has been selected")
+		os.Exit(1)
+	}
 
 	service := shortener.NewRedirectService(repo)
 	handler := h.NewHandler(service)
@@ -91,19 +106,25 @@ func main() {
 	r.Get("/{code}", handler.Get)
 	r.Post("/", handler.Post)
 
-	errs := make(chan error, 2)
+	httperrs := make(chan error, 2)
 	go func() {
-		fmt.Println("Listening on port :8000")
-		errs <- http.ListenAndServe(httpPort(), r)
+		fmt.Println("Listening for http on port :8000")
+		httperrs <- http.ListenAndServe(httpPort(), r)
 
 	}()
 
 	go func() {
 		c := make(chan os.Signal, 1)
 		signal.Notify(c, syscall.SIGINT)
-		errs <- fmt.Errorf("%s", <-c)
+		httperrs <- fmt.Errorf("%s", <-c)
 	}()
 
-	fmt.Printf("Terminated %s", <-errs)
+	fmt.Printf("Terminated %s\n", <-httperrs)
+}
+
+func main() {
+
+	go setupGRPC()
+	defer setupHTTP()
 
 }

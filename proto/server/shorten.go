@@ -17,7 +17,6 @@ type Redirect struct{}
 var firstTime bool = true
 var redirectService shortener.RedirectService
 var repo shortener.RedirectRepo
-var rem string
 
 func firstTimeSetup() {
 	repo, err := mr.NewMockRepo()
