@@ -4,42 +4,21 @@ import (
 	"context"
 	"log"
 	protos "urlshort/proto/shorten"
-	mr "urlshort/repository/mock"
-	"urlshort/shortener"
+	h "urlshort/api/grpc"
 )
 
 type ShortenRequest struct {
 	link string
 }
 
-type Redirect struct{}
+var handler h.RedirectHandler
 
-var firstTime bool = true
-var redirectService shortener.RedirectService
-var repo shortener.RedirectRepo
-
-func firstTimeSetup() {
-	repo, err := mr.NewMockRepo()
-	if err != nil {
-		log.Fatal(err)
-	}
-	redirectService = shortener.NewRedirectService(repo)
-}
-
-func (r *Redirect) grpcToRedirect(link string) *shortener.Redirect {
-	redirect := &shortener.Redirect{}
-	redirect.URL = link
-	return redirect
+func SaveHandler(h h.RedirectHandler) {
+	handler = h
 }
 
 func (sr *ShortenRequest) GetShortURL(ctx context.Context, ll *protos.LongLink) (*protos.ShortLink, error) {
-	if firstTime {
-		firstTimeSetup()
-		firstTime = false
-	}
-	redirStruct := &Redirect{}
-	r := redirStruct.grpcToRedirect(ll.Link)
-	err := redirectService.Store(r)
+	r, err := handler.PostRedir(ll.Link)
 	if err != nil {
 		log.Fatal(err)
 	}

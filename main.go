@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"google.golang.org/grpc"
+
 	//"google.golang.org/grpc/reflection"
 	"log"
 	"net"
@@ -13,7 +15,8 @@ import (
 	"os/signal"
 	"strconv"
 	"syscall"
-	h "urlshort/api"
+	hh "urlshort/api/http"
+	hg "urlshort/api/grpc"
 	shortie "urlshort/proto/server"
 	protos "urlshort/proto/shorten"
 	mockrepo "urlshort/repository/mock"
@@ -66,7 +69,10 @@ func chooseRepo() shortener.RedirectRepo {
 	return nil
 }
 
-func setupGRPC() {
+func setupGRPC(servicegrpc shortener.RedirectService) {
+	handlergrpc := hg.NewHandlerGRPC(servicegrpc)
+	shortie.SaveHandler(handlergrpc)
+
 	listener, err := net.Listen("tcp", ":4040")
 	if err != nil {
 		log.Fatal("ye dun goofed")
@@ -87,15 +93,8 @@ func setupGRPC() {
 	fmt.Printf("Terminated %s\n", <-grpcerrs)
 }
 
-func setupHTTP() {
-	repo := chooseRepo()
-	if repo == nil {
-		fmt.Println("No database backend has been selected")
-		os.Exit(1)
-	}
-
-	service := shortener.NewRedirectService(repo)
-	handler := h.NewHandler(service)
+func setupHTTP(service shortener.RedirectService) {
+	handler := hh.NewHandler(service)
 
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
@@ -123,8 +122,15 @@ func setupHTTP() {
 }
 
 func main() {
+	repo := chooseRepo()
+	if repo == nil {
+		fmt.Println("No database backend has been selected")
+		os.Exit(1)
+	}
 
-	go setupGRPC()
-	defer setupHTTP()
+	service := shortener.NewRedirectService(repo)
+
+	go setupGRPC(service)
+	defer setupHTTP(service)
 
 }
