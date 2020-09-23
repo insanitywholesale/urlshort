@@ -9,7 +9,7 @@ import (
 type Redirect struct{}
 
 func (r *Redirect) Decode(input []byte) (*shortener.Redirect, error) {
-	redirect := shortener.Redirect{}
+	redirect := &shortener.Redirect{}
 	err := xml.Unmarshal(input, redirect)
 	if err != nil {
 		return nil, errors.Wrap(err, "serializer.Redirect.Decode")
