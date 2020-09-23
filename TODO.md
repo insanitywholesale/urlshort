@@ -1,5 +1,4 @@
 # things to do
 - write tests
-- gRPC for codes
+- gRPC for sending codes and returning redirects
 - rethinkdb repository option
-- xml serialization option
