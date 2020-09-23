@@ -6,7 +6,8 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"google.golang.org/grpc"
-
+	//"google.golang.org/grpc/keepalive"
+	//"time"
 	//"google.golang.org/grpc/reflection"
 	"log"
 	"net"
@@ -15,8 +16,8 @@ import (
 	"os/signal"
 	"strconv"
 	"syscall"
-	hh "urlshort/api/http"
 	hg "urlshort/api/grpc"
+	hh "urlshort/api/http"
 	shortie "urlshort/proto/server"
 	protos "urlshort/proto/shorten"
 	mockrepo "urlshort/repository/mock"
@@ -78,6 +79,12 @@ func setupGRPC(servicegrpc shortener.RedirectService) {
 		log.Fatal("ye dun goofed")
 	}
 	grpcServer := grpc.NewServer()
+	//grpcServer := grpc.NewServer(
+	//	grpc.KeepaliveParams(keepalive.ServerParameters{
+	//		MaxConnectionIdle: 20 * time.Minute,
+	//		Timeout: 20 * time.Minute,
+	//	}),
+	//)
 	protos.RegisterShortenRequestServer(grpcServer, &shortie.ShortenRequest{})
 	grpcerrs := make(chan error, 2)
 	go func() {

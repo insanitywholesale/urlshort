@@ -3,8 +3,8 @@ package server
 import (
 	"context"
 	"log"
-	protos "urlshort/proto/shorten"
 	h "urlshort/api/grpc"
+	protos "urlshort/proto/shorten"
 )
 
 type ShortenRequest struct {
