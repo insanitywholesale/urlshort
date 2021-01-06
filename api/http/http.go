@@ -8,6 +8,7 @@ import (
 	"net/http"
 	js "urlshort/serializer/json"
 	ms "urlshort/serializer/msgpack"
+	xs "urlshort/serializer/xml"
 	"urlshort/shortener"
 )
 
@@ -37,6 +38,9 @@ func (h *handler) serializer(contentType string) shortener.RedirectSerializer {
 	if contentType == "application/x-msgpack" {
 		return &ms.Redirect{}
 	}
+	if contentType == "application/xml" {
+		return &xs.Redirect{}
+	}
 	return &js.Redirect{}
 }
 
@@ -62,6 +66,8 @@ func (h *handler) Post(w http.ResponseWriter, r *http.Request) {
 	}
 	redirect, err := h.serializer(contentType).Decode(requestBody)
 	if err != nil {
+		log.Println("contenttype", contentType)
+		log.Println("error:", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
