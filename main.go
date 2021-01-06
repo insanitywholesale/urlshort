@@ -42,7 +42,7 @@ func httpPort() string {
 	return fmt.Sprintf(":%s", port)
 }
 
-func chooseRepo() shortener.RedirectRepo {
+func chooseRepo() (shortener.RedirectRepo, error) {
 	switch os.Getenv("URL_DB") {
 	case "redis":
 		redisURL := os.Getenv("REDIS_URL")
@@ -50,7 +50,7 @@ func chooseRepo() shortener.RedirectRepo {
 		if err != nil {
 			log.Fatal(err)
 		}
-		return repo
+		return repo, nil
 	case "mongo":
 		mongoURL := os.Getenv("MONGO_URL")
 		mongodb := os.Getenv("MONGO_DB")
@@ -59,15 +59,15 @@ func chooseRepo() shortener.RedirectRepo {
 		if err != nil {
 			log.Fatal(err)
 		}
-		return repo
+		return repo, nil
 	default:
 		repo, err := mockrepo.NewMockRepo()
 		if err != nil {
 			log.Fatal(err)
 		}
-		return repo
+		return repo, nil
 	}
-	return nil
+	return nil, nil
 }
 
 func setupGRPC(servicegrpc shortener.RedirectService) {
@@ -129,8 +129,8 @@ func setupHTTP(service shortener.RedirectService) {
 }
 
 func main() {
-	repo := chooseRepo()
-	if repo == nil {
+	repo, repoErr := chooseRepo()
+	if repoErr != nil {
 		fmt.Println("No database backend has been selected")
 		os.Exit(1)
 	}
