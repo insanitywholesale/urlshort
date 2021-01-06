@@ -100,7 +100,7 @@ func setupGRPC(servicegrpc shortener.RedirectService) {
 	fmt.Printf("Terminated %s\n", <-grpcerrs)
 }
 
-func setupHTTP(service shortener.RedirectService) {
+func makeRouter(service shortener.RedirectService) http.Handler {
 	handler := hh.NewHandler(service)
 
 	r := chi.NewRouter()
@@ -111,7 +111,11 @@ func setupHTTP(service shortener.RedirectService) {
 
 	r.Get("/{code}", handler.Get)
 	r.Post("/", handler.Post)
+	return r
+}
 
+func setupHTTP(service shortener.RedirectService) {
+	r := makeRouter(service)
 	httperrs := make(chan error, 2)
 	go func() {
 		fmt.Println("Listening for http on port :8000")

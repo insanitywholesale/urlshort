@@ -2,26 +2,34 @@ package main
 
 import (
 	"net/http"
-	"urlshort/shortener"
+	"net/http/httptest"
 	"testing"
-	"time"
+	"urlshort/shortener"
 )
 
 // Test is still incomplete
-// Should be integration test
-// This sometimes works as it should
-// There is definitely a race condition here
+// Should be integration test maybe
 func TestGet(t *testing.T) {
+	// initialize mock repo
 	repo, repoErr := chooseRepo()
 	if repoErr != nil {
 		t.Errorf("repo oopsie")
 	}
+	// make redirect service
 	service := shortener.NewRedirectService(repo)
-	go setupHTTP(service)
-	time.Sleep(5 * time.Second)
-	val, err := http.Get("http://localhost:8000/1234")
+	// create router based on the above service
+	r := makeRouter(service)
+	// create and start a test server
+	testServer := httptest.NewServer(r)
+
+	// do a simple Get request on preexisting redirect
+	// said redirect can be found in the mock repo source
+	res, err := http.Get(testServer.URL + "/1234")
+	// be responsible and close the response body
+	res.Body.Close()
 	if err != nil {
-		t.Errorf("no respond")
+		t.Errorf("tfw no respond")
 	}
-	t.Log("val:", val)
+	// close the test server
+	testServer.Close()
 }
