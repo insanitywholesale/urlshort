@@ -101,7 +101,7 @@ func TestPostMsgPack(t *testing.T) {
 	testServer := httptest.NewServer(r)
 
 	// create some data in the form of an io.Reader from a string of xml
-	msgpackData, err := msgpack.Marshal(&shortener.Redirect{URL: "https://i.me"})
+	msgpackData, err := msgpack.Marshal(&shortener.Redirect{URL: "https://inherently.xyz"})
 	// do a simple Post request with the above data
 	res, err := http.Post(testServer.URL, "application/x-msgpack", bytes.NewBuffer(msgpackData))
 	// be responsible and close the response body
