@@ -8,7 +8,7 @@ import (
 var localRedir Redirect
 
 func TestJson(t *testing.T) {
-	jsonBytes := []byte(`{"code":"freeDrinks", "URL":"http://example.com/drink", "CreatedAt": 9223372036854775007}`)
+	jsonBytes := []byte(`{"code":"freeDrinks", "url":"http://example.com/drink", "created_at": 9223372036854775007}`)
 	decodedRedirect, err := localRedir.Decode(jsonBytes)
 	if err != nil {
 		t.Fatal("decode error:", err)

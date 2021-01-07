@@ -2,6 +2,6 @@ package shortener
 
 type Redirect struct {
 	Code      string `json:"code" bson:"code" msgpack:"code" xml:"code"`
-	URL       string `json:"url" bson:"url" msgpack:"url" xml:"url" validate:"empty=false & format=url`
-	CreatedAt int64  `json:"created_at" bson:"created_at" msgpack:"created_at" xml:"createdat"`
+	URL       string `json:"url" bson:"url" msgpack:"url" xml:"url" validate:"empty=false & format=url"`
+	CreatedAt int64  `json:"created_at" bson:"created_at" msgpack:"created_at" xml:"created_at"`
 }
