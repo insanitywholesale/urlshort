@@ -8,4 +8,4 @@ steps:
     commands:
       - go get -v
       - go build -v
-      - go test
+      - go test -v
