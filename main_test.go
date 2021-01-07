@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"github.com/vmihailenco/msgpack/v5"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -34,7 +35,7 @@ func TestGet(t *testing.T) {
 	testServer.Close()
 }
 
-func TestPost(t *testing.T) {
+func TestPostJSON(t *testing.T) {
 	// initialize mock repo
 	repo, err := chooseRepo()
 	if err != nil {
@@ -48,9 +49,61 @@ func TestPost(t *testing.T) {
 	testServer := httptest.NewServer(r)
 
 	// create some data in the form of an io.Reader from a string of json
-	jsonData := bytes.NewBuffer([]byte(`{"url": "https://todo.distro.watch"}`))
+	jsonData := []byte(`{"url": "https://todo.distro.watch"}`)
 	// do a simple Post request with the above data
-	res, err := http.Post(testServer.URL, "application/json", jsonData)
+	res, err := http.Post(testServer.URL, "application/json", bytes.NewBuffer(jsonData))
+	// be responsible and close the response body
+	res.Body.Close()
+	if err != nil {
+		t.Error("tfw POST error:", err)
+	}
+	// close the test server
+	testServer.Close()
+}
+
+func TestPostXML(t *testing.T) {
+	// initialize mock repo
+	repo, err := chooseRepo()
+	if err != nil {
+		t.Error("repo oopsie")
+	}
+	// make redirect service
+	service := shortener.NewRedirectService(repo)
+	// create router based on the above service
+	r := makeRouter(service)
+	// create and start a test server
+	testServer := httptest.NewServer(r)
+
+	// create some data in the form of an io.Reader from a string of xml
+	xmlData := []byte(`<redirect><url>https://distro.watch</url></redirect>`)
+	// do a simple Post request with the above data
+	res, err := http.Post(testServer.URL, "application/xml", bytes.NewBuffer(xmlData))
+	// be responsible and close the response body
+	res.Body.Close()
+	if err != nil {
+		t.Error("tfw POST error:", err)
+	}
+	// close the test server
+	testServer.Close()
+}
+
+func TestPostMsgPack(t *testing.T) {
+	// initialize mock repo
+	repo, err := chooseRepo()
+	if err != nil {
+		t.Error("repo oopsie")
+	}
+	// make redirect service
+	service := shortener.NewRedirectService(repo)
+	// create router based on the above service
+	r := makeRouter(service)
+	// create and start a test server
+	testServer := httptest.NewServer(r)
+
+	// create some data in the form of an io.Reader from a string of xml
+	msgpackData, err := msgpack.Marshal(&shortener.Redirect{URL: "https://i.me"})
+	// do a simple Post request with the above data
+	res, err := http.Post(testServer.URL, "application/x-msgpack", bytes.NewBuffer(msgpackData))
 	// be responsible and close the response body
 	res.Body.Close()
 	if err != nil {
