@@ -66,8 +66,6 @@ func (h *handler) Post(w http.ResponseWriter, r *http.Request) {
 	}
 	redirect, err := h.serializer(contentType).Decode(requestBody)
 	if err != nil {
-		log.Println("contenttype", contentType)
-		log.Println("error:", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
