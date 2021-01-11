@@ -2,10 +2,18 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"github.com/vmihailenco/msgpack/v5"
+	ggrpc "google.golang.org/grpc"
+	"google.golang.org/grpc/test/bufconn"
+	"log"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	hg "urlshort/api/grpc"
+	shortie "urlshort/proto/server"
+	protos "urlshort/proto/shorten"
 	"urlshort/shortener"
 )
 
@@ -110,5 +118,58 @@ func TestPostMsgPack(t *testing.T) {
 		t.Error("tfw POST error:", err)
 	}
 	// close the test server
+	testServer.Close()
+}
+
+func TestGPRC(t *testing.T) {
+	const bufSize = 1024 * 1024
+	var listener *bufconn.Listener
+	listener = bufconn.Listen(bufSize)
+	grpcServer := ggrpc.NewServer()
+	protos.RegisterShortenRequestServer(grpcServer, &shortie.ShortenRequest{})
+	go func() {
+		err := grpcServer.Serve(listener)
+		if err != nil {
+			log.Fatalf("Server exited with error: %v", err)
+		}
+	}()
+
+	// initialize mock repo
+	repo, err := chooseRepo()
+	if err != nil {
+		t.Error("repo oopsie")
+	}
+	// make redirect service
+	service := shortener.NewRedirectService(repo)
+	//http service needs to be up in order to test if the shortcode works
+	// create router based on the above service
+	r := makeRouter(service)
+	// create and start a test server
+	testServer := httptest.NewServer(r)
+
+	// set up grpc connection
+	ctx := context.Background()
+	conn, err := ggrpc.DialContext(
+		ctx,
+		"bufnet",
+		ggrpc.WithContextDialer(func(context.Context, string) (net.Conn, error) { return listener.Dial() }),
+		ggrpc.WithInsecure(),
+	)
+	if err != nil {
+		t.Fatalf("Failed to dial bufnet: %v", err)
+	}
+	defer conn.Close()
+
+	// make handler for grpc
+	handlergrpc := hg.NewHandlerGRPC(service)
+	shortie.SaveHandler(handlergrpc)
+
+	// make a grpc client
+	client := protos.NewShortenRequestClient(conn)
+	response, err := client.GetShortURL(ctx, &protos.LongLink{Link: "https://distro.watch"})
+	// test if shortcode works
+	http.Get(testServer.URL + response.Link)
+
+	// close test http server
 	testServer.Close()
 }
