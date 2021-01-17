@@ -22,6 +22,5 @@ func (sr *ShortenRequest) GetShortURL(ctx context.Context, ll *protos.LongLink) 
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	return &protos.ShortLink{Link: r.Code}, nil
 }
