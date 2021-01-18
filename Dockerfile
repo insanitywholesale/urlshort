@@ -1,4 +1,4 @@
-# build
+# build stage
 FROM golang:alpine as build
 WORKDIR /go/src/urlshort
 COPY . .
@@ -8,7 +8,7 @@ ENV GOARCH amd64
 RUN go get -d -v ./...
 RUN go install -v ./...
 
-# run
+# run stage
 FROM busybox:musl
 WORKDIR /go/bin/
 RUN chown -R 5000:5000 /go
