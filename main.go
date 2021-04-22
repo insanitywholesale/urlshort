@@ -92,8 +92,8 @@ func setupHTTP(service shortener.RedirectService) http.Handler {
 
 func httpGrpcRouter(grpcServer *grpc.Server, httpHandler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-//if r.ProtoMajor == 2 && strings.Contains(r.Header.Get("Content-Type"), "application/grpc") {
-//the above check is entirely correct but it causes real requests to not be routed to grpc
+		//if r.ProtoMajor == 2 && strings.Contains(r.Header.Get("Content-Type"), "application/grpc") {
+		//the above check is entirely correct but it causes real requests to not be routed to grpc
 		if r.Header.Get("Content-Type") != "application/json" {
 			log.Println("routing to grpc")
 			grpcServer.ServeHTTP(w, r)

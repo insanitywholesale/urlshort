@@ -10,20 +10,11 @@ import (
 type ShortenRequest struct {
 	link string
 }
-type RedirectHandler interface {
-	//figure this out
-}
 
-//copy of what is in http.go api
-type handler struct {
-	redirectService shortener.RedirectService
-}
-
-//might not be required -- doesn't even do anything at this point
 var redirSrv shortener.RedirectService
 
 func NewHandlerGRPC(redirectService shortener.RedirectService) {
-	//probably need to add more to this
+	//provide access to redirectService create in main.go
 	redirSrv = redirectService
 }
 
@@ -38,4 +29,3 @@ func (sr *ShortenRequest) GetShortURL(ctx context.Context, ll *protos.LongLink) 
 	}
 	return &protos.ShortLink{Link: r.Code}, nil
 }
-
