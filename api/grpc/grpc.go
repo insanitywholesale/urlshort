@@ -18,7 +18,7 @@ func (sr *ShortenRequest) GetShortURL(ctx context.Context, ll *protos.LongLink) 
 	err := redirSrv.Store(r)
 	if err != nil {
 		log.Println("oofie", err)
-		return &protos.ShortLink{}, err
+		return nil, err
 	}
 	return &protos.ShortLink{Link: r.Code}, nil
 }

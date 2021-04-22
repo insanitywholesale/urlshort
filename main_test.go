@@ -12,7 +12,6 @@ import (
 	"net/http/httptest"
 	"testing"
 	hg "urlshort/api/grpc"
-	shortie "urlshort/proto/server"
 	protos "urlshort/proto/shorten"
 	"urlshort/shortener"
 )
