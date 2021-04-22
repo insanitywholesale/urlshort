@@ -116,5 +116,5 @@ func main() {
 	//gS := setupGRPC(service)
 	hH := setupHTTP(service)
 	gS := setupGRPC(service)
-	http.ListenAndServe(":8080", httpGrpcRouter(gS, hH))
+	log.Fatal(http.ListenAndServe(":8086", httpGrpcRouter(gS, hH)))
 }
