@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"strings"
+	//"strings"
 	shortie "urlshort/api/grpc"
 	hh "urlshort/api/http"
 	protos "urlshort/proto/shorten"
@@ -92,9 +92,13 @@ func setupHTTP(service shortener.RedirectService) http.Handler {
 
 func httpGrpcRouter(grpcServer *grpc.Server, httpHandler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.ProtoMajor == 2 && strings.Contains(r.Header.Get("Content-Type"), "application/grpc") {
+//if r.ProtoMajor == 2 && strings.Contains(r.Header.Get("Content-Type"), "application/grpc") {
+//the above check is entirely correct but it causes real requests to not be routed to grpc
+		if r.Header.Get("Content-Type") != "application/json" {
+			log.Println("routing to grpc")
 			grpcServer.ServeHTTP(w, r)
 		} else {
+			log.Println("routing to http")
 			httpHandler.ServeHTTP(w, r)
 		}
 	})
@@ -109,11 +113,6 @@ func main() {
 
 	service := shortener.NewRedirectService(repo)
 
-	/*
-		go setupGRPC(service)
-		defer setupHTTP(service)
-	*/
-	//gS := setupGRPC(service)
 	hH := setupHTTP(service)
 	gS := setupGRPC(service)
 	log.Fatal(http.ListenAndServe(":8086", httpGrpcRouter(gS, hH)))
