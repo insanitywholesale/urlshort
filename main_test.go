@@ -11,8 +11,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	hg "urlshort/api/grpc"
-	shortie "urlshort/proto/server"
+	//hg "urlshort/api/grpc"
+	shortie "urlshort/api/grpc"
 	protos "urlshort/proto/shorten"
 	"urlshort/shortener"
 )
@@ -143,9 +143,10 @@ func TestGPRC(t *testing.T) {
 	service := shortener.NewRedirectService(repo)
 	//http service needs to be up in order to test if the shortcode works
 	// create router based on the above service
-	r := makeRouter(service)
+	hH := setupHTTP(service)
+	gS := setupGRPC(service)
 	// create and start a test server
-	testServer := httptest.NewServer(r)
+	testServer := httptest.NewServer(httpGrpcRouter(gS, hH))
 
 	// set up grpc connection
 	ctx := context.Background()
@@ -161,8 +162,8 @@ func TestGPRC(t *testing.T) {
 	defer conn.Close()
 
 	// make handler for grpc
-	handlergrpc := hg.NewHandlerGRPC(service)
-	shortie.SaveHandler(handlergrpc)
+	//handlergrpc := hg.NewHandlerGRPC(service)
+	//shortie.SaveHandler(handlergrpc)
 
 	// make a grpc client
 	client := protos.NewShortenRequestClient(conn)

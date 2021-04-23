@@ -6,19 +6,13 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"google.golang.org/grpc"
-	//"google.golang.org/grpc/keepalive"
-	//"time"
-	//"google.golang.org/grpc/reflection"
 	"log"
-	"net"
 	"net/http"
 	"os"
-	"os/signal"
 	"strconv"
-	"syscall"
-	hg "urlshort/api/grpc"
+	//"strings"
+	shortie "urlshort/api/grpc"
 	hh "urlshort/api/http"
-	shortie "urlshort/proto/server"
 	protos "urlshort/proto/shorten"
 	mockrepo "urlshort/repository/mock"
 	mr "urlshort/repository/mongo"
@@ -70,34 +64,11 @@ func chooseRepo() (shortener.RedirectRepo, error) {
 	return nil, nil
 }
 
-func setupGRPC(servicegrpc shortener.RedirectService) {
-	handlergrpc := hg.NewHandlerGRPC(servicegrpc)
-	shortie.SaveHandler(handlergrpc)
-
-	listener, err := net.Listen("tcp", ":4040")
-	if err != nil {
-		log.Fatal("ye dun goofed")
-	}
+func setupGRPC(servicegrpc shortener.RedirectService) *grpc.Server {
 	grpcServer := grpc.NewServer()
-	//grpcServer := grpc.NewServer(
-	//	grpc.KeepaliveParams(keepalive.ServerParameters{
-	//		MaxConnectionIdle: 20 * time.Minute,
-	//		Timeout: 20 * time.Minute,
-	//	}),
-	//)
 	protos.RegisterShortenRequestServer(grpcServer, &shortie.ShortenRequest{})
-	grpcerrs := make(chan error, 2)
-	go func() {
-		fmt.Println("Listening for grpc on port :4040")
-		grpcerrs <- grpcServer.Serve(listener)
-	}()
-	go func() {
-		c := make(chan os.Signal, 1)
-		signal.Notify(c, syscall.SIGINT)
-		grpcerrs <- fmt.Errorf("%s", <-c)
-	}()
-
-	fmt.Printf("Terminated %s\n", <-grpcerrs)
+	shortie.NewHandlerGRPC(servicegrpc)
+	return grpcServer
 }
 
 func makeRouter(service shortener.RedirectService) http.Handler {
@@ -114,22 +85,23 @@ func makeRouter(service shortener.RedirectService) http.Handler {
 	return r
 }
 
-func setupHTTP(service shortener.RedirectService) {
+func setupHTTP(service shortener.RedirectService) http.Handler {
 	r := makeRouter(service)
-	httperrs := make(chan error, 2)
-	go func() {
-		fmt.Println("Listening for http on port :8000")
-		httperrs <- http.ListenAndServe(httpPort(), r)
+	return r
+}
 
-	}()
-
-	go func() {
-		c := make(chan os.Signal, 1)
-		signal.Notify(c, syscall.SIGINT)
-		httperrs <- fmt.Errorf("%s", <-c)
-	}()
-
-	fmt.Printf("Terminated %s\n", <-httperrs)
+func httpGrpcRouter(grpcServer *grpc.Server, httpHandler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		//if r.ProtoMajor == 2 && strings.Contains(r.Header.Get("Content-Type"), "application/grpc") {
+		//the above check is entirely correct but it causes real requests to not be routed to grpc
+		if r.Header.Get("Content-Type") != "application/json" {
+			log.Println("routing to grpc")
+			grpcServer.ServeHTTP(w, r)
+		} else {
+			log.Println("routing to http")
+			httpHandler.ServeHTTP(w, r)
+		}
+	})
 }
 
 func main() {
@@ -141,7 +113,7 @@ func main() {
 
 	service := shortener.NewRedirectService(repo)
 
-	go setupGRPC(service)
-	defer setupHTTP(service)
-
+	hH := setupHTTP(service)
+	gS := setupGRPC(service)
+	log.Fatal(http.ListenAndServe(":8086", httpGrpcRouter(gS, hH)))
 }

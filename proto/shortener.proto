@@ -6,6 +6,7 @@ option go_package = ".;shorten";
 
 service ShortenRequest {
 	rpc GetShortURL(LongLink) returns (ShortLink);
+	//TODO: implement GetLongURL
 }
 
 message LongLink {

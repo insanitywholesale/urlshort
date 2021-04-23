@@ -1,32 +1,31 @@
 package grpcapi
 
 import (
+	"context"
+	"log"
+	protos "urlshort/proto/shorten"
 	"urlshort/shortener"
 )
 
-type RedirectHandler interface {
-	PostRedir(string) (*shortener.Redirect, error)
+type ShortenRequest struct {
+	link string
 }
 
-type handler struct {
-	redirectService shortener.RedirectService
+var redirSrv shortener.RedirectService
+
+func NewHandlerGRPC(redirectService shortener.RedirectService) {
+	//provide access to redirectService create in main.go
+	redirSrv = redirectService
 }
 
-type Redirect struct{}
-
-func NewHandlerGRPC(redirectService shortener.RedirectService) RedirectHandler {
-	return &handler{redirectService: redirectService}
-}
-
-func (r *Redirect) grpcToRedirect(link string) *shortener.Redirect {
-	redirect := &shortener.Redirect{}
-	redirect.URL = link
-	return redirect
-}
-
-func (h *handler) PostRedir(ll string) (*shortener.Redirect, error) {
-	redir := &Redirect{}
-	r := redir.grpcToRedirect(ll)
-	h.redirectService.Store(r)
-	return r, nil
+//figure out how to have this func attached both to `ShortenRequest` and `handler`
+func (sr *ShortenRequest) GetShortURL(ctx context.Context, ll *protos.LongLink) (*protos.ShortLink, error) {
+	log.Println("in GetShortURL")
+	r := &shortener.Redirect{URL: ll.Link}
+	err := redirSrv.Store(r)
+	if err != nil {
+		log.Println("oofie", err)
+		return nil, err
+	}
+	return &protos.ShortLink{Link: r.Code}, nil
 }
