@@ -61,7 +61,6 @@ func chooseRepo() (shortener.RedirectRepo, error) {
 		}
 		return repo, nil
 	}
-	return nil, nil
 }
 
 func setupGRPC(servicegrpc shortener.RedirectService) *grpc.Server {
