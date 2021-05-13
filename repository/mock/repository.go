@@ -2,7 +2,7 @@ package mock
 
 import (
 	"fmt"
-	"urlshort/shortener"
+	"gitlab.com/insanitywholesale/urlshort/shortener"
 )
 
 // Type mockRepo is a list of storedRedirect

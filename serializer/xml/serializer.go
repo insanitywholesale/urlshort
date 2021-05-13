@@ -3,7 +3,7 @@ package xml
 import (
 	"encoding/xml"
 	"github.com/pkg/errors"
-	"urlshort/shortener"
+	"gitlab.com/insanitywholesale/urlshort/shortener"
 )
 
 type Redirect struct{}

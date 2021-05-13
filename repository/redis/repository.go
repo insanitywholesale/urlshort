@@ -5,7 +5,7 @@ import (
 	"github.com/go-redis/redis"
 	"github.com/pkg/errors"
 	"strconv"
-	"urlshort/shortener"
+	"gitlab.com/insanitywholesale/urlshort/shortener"
 )
 
 type redisRepo struct {

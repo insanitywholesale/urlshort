@@ -6,10 +6,10 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	js "urlshort/serializer/json"
-	ms "urlshort/serializer/msgpack"
-	xs "urlshort/serializer/xml"
-	"urlshort/shortener"
+	js "gitlab.com/insanitywholesale/urlshort/serializer/json"
+	ms "gitlab.com/insanitywholesale/urlshort/serializer/msgpack"
+	xs "gitlab.com/insanitywholesale/urlshort/serializer/xml"
+	"gitlab.com/insanitywholesale/urlshort/shortener"
 )
 
 type RedirectHandler interface {

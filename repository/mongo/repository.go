@@ -8,7 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"time"
-	"urlshort/shortener"
+	"gitlab.com/insanitywholesale/urlshort/shortener"
 )
 
 // mongoRepo is a struct with all the fields required to create a new mongo database

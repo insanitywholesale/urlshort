@@ -3,7 +3,7 @@ package msgpack
 import (
 	"github.com/pkg/errors"
 	"github.com/vmihailenco/msgpack"
-	"urlshort/shortener"
+	"gitlab.com/insanitywholesale/urlshort/shortener"
 )
 
 type Redirect struct{}

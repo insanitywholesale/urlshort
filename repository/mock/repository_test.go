@@ -2,7 +2,7 @@ package mock
 
 import (
 	"testing"
-	"urlshort/shortener"
+	"gitlab.com/insanitywholesale/urlshort/shortener"
 )
 
 func TestMock(t *testing.T) {

@@ -11,10 +11,10 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	//hg "urlshort/api/grpc"
-	shortie "urlshort/api/grpc"
-	protos "urlshort/proto/shorten"
-	"urlshort/shortener"
+	//hg "gitlab.com/insanitywholesale/urlshort/api/grpc"
+	shortie "gitlab.com/insanitywholesale/urlshort/api/grpc"
+	protos "gitlab.com/insanitywholesale/urlshort/proto/shorten"
+	"gitlab.com/insanitywholesale/urlshort/shortener"
 )
 
 // Test is still incomplete

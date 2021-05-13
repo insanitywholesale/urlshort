@@ -2,7 +2,7 @@ package xml
 
 import (
 	"testing"
-	"urlshort/shortener"
+	"gitlab.com/insanitywholesale/urlshort/shortener"
 )
 
 var localRedir Redirect
