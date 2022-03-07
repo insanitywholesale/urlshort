@@ -2,15 +2,8 @@ package main
 
 import (
 	"fmt"
-
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	"google.golang.org/grpc"
-	"log"
-	"net/http"
-	"os"
-	"strconv"
-	"strings"
 	shortie "gitlab.com/insanitywholesale/urlshort/api/grpc"
 	hh "gitlab.com/insanitywholesale/urlshort/api/http"
 	protos "gitlab.com/insanitywholesale/urlshort/proto/shorten"
@@ -18,6 +11,12 @@ import (
 	mr "gitlab.com/insanitywholesale/urlshort/repository/mongo"
 	rr "gitlab.com/insanitywholesale/urlshort/repository/redis"
 	"gitlab.com/insanitywholesale/urlshort/shortener"
+	"google.golang.org/grpc"
+	"log"
+	"net/http"
+	"os"
+	"strconv"
+	"strings"
 )
 
 func grpcPort() string {
@@ -92,8 +91,8 @@ func setupHTTP(service shortener.RedirectService) http.Handler {
 func httpGrpcRouter(grpcServer *grpc.Server, httpHandler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.ProtoMajor != 2 && !(strings.Contains(r.Header.Get("Content-Type"), "application/grpc")) {
-		//alternative and worse way to check
-		//if r.Header.Get("Content-Type") != "application/grpc" {
+			//alternative and worse way to check
+			//if r.Header.Get("Content-Type") != "application/grpc" {
 			log.Println("routing to http")
 			httpHandler.ServeHTTP(w, r)
 		} else {
