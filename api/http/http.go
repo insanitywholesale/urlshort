@@ -3,13 +3,13 @@ package api
 import (
 	"github.com/go-chi/chi"
 	"github.com/pkg/errors"
-	"io/ioutil"
-	"log"
-	"net/http"
 	js "gitlab.com/insanitywholesale/urlshort/serializer/json"
 	ms "gitlab.com/insanitywholesale/urlshort/serializer/msgpack"
 	xs "gitlab.com/insanitywholesale/urlshort/serializer/xml"
 	"gitlab.com/insanitywholesale/urlshort/shortener"
+	"io/ioutil"
+	"log"
+	"net/http"
 )
 
 type RedirectHandler interface {

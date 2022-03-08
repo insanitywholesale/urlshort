@@ -1,8 +1,8 @@
 package msgpack
 
 import (
-	"testing"
 	"gitlab.com/insanitywholesale/urlshort/shortener"
+	"testing"
 )
 
 var localRedir Redirect

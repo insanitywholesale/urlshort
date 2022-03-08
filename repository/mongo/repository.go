@@ -3,12 +3,12 @@ package mongo
 import (
 	"context"
 	"github.com/pkg/errors"
+	"gitlab.com/insanitywholesale/urlshort/shortener"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"time"
-	"gitlab.com/insanitywholesale/urlshort/shortener"
 )
 
 // mongoRepo is a struct with all the fields required to create a new mongo database

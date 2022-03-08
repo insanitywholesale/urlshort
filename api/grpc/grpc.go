@@ -2,9 +2,9 @@ package grpcapi
 
 import (
 	"context"
-	"log"
 	protos "gitlab.com/insanitywholesale/urlshort/proto/shorten"
 	"gitlab.com/insanitywholesale/urlshort/shortener"
+	"log"
 )
 
 type ShortenRequest struct {
